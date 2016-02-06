@@ -14,40 +14,69 @@
 
     <!-- Latest compiled and minified JavaScript -->
     <script src="Scripts/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="Content/css/styles.css" />    
+    <link rel="stylesheet" href="Content/css/styles.css"/>
+
+    <!-- SmartMenus jQuery Bootstrap Addon CSS -->
+    <link rel="stylesheet" href="Content/css/jquery.smartmenus.bootstrap.css"/>
+    <script src="Scripts/jquery.smartmenus.js"></script>
+    <script src="Scripts/jquery.smartmenus.bootstrap.js"></script>
 
 </head>
 <body>
-    <div>
-        <nav class="navbar navbar-inverse navbar-fixed-top">
-            <div class="container">
+<div class="navbar navbar-default" role="navigation">
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <!--
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Project name</a>
+        </div>
+        -->
+        <div class="navbar-collapse collapse">
+
+            <!-- Left nav -->
+            <ul class="nav navbar-nav" data-hole="menubar">
+                
+            </ul>
 
 
-                <div id="navbar" class="navbar-collapse collapse">
-                    <ul class="nav navbar-nav" data-hole="menubar">
+        </div><!--/.nav-collapse -->
+    </nav>
+</div>
+
+<div style="display: none;">
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
 
 
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav" data-hole="menubar"></ul>
 
-                    </ul>
-
-
-                </div><!--/.nav-collapse -->
 
             </div>
-        </nav>
+
+        </div>
+    </nav>
+</div>
+
+
+
+<div class="container">
+    <div data-replace="body">
     </div>
+</div>
+<footer class="footer">
     <div class="container">
-        <div data-replace="body">
-        </div>
+        <p class="text-muted">
+            For an enhanced template that provides automatic GitHub deployment to Azure, fork from <a href="https://github.com/intellifactory/ClientServer.Azure">GitHub</a>, or
+            read more <a href="http://websharper.com/blog-entry/4368/deploying-websharper-apps-to-azure-via-github">here</a>.
+        </p>
     </div>
-    <footer class="footer">
-        <div class="container">
-            <p class="text-muted">
-                For an enhanced template that provides automatic GitHub deployment to Azure, fork from <a href="https://github.com/intellifactory/ClientServer.Azure">GitHub</a>, or
-                read more <a href="http://websharper.com/blog-entry/4368/deploying-websharper-apps-to-azure-via-github">here</a>.
-            </p>
-        </div>
-    </footer>
-    <script data-replace="scripts"></script>
+</footer>
+<script data-replace="scripts"></script>
 </body>
 </html>

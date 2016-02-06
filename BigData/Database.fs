@@ -14,6 +14,20 @@ module Database =
         type GetMainMenu =
             SqlCommandProvider<"SELECT a.menuorder, a.english, a.chinese, a.menucode, a.submenu FROM menus a with (nolock) WHERE a.menucode<>'FAVORITE' AND a.submenu<>'FAVORITE' AND a.menucode<>'ESS' AND a.submenu<>'ESS' and menulevel = @level and menucode=@menucode and (a.menucode + '_' +convert(nvarchar, a.menuopt) <> 'PAYROLL_9' )  ORDER BY a.menulevel,a.menucode,CASE WHEN a.menuopt<1000 AND a.menucode='WEBSITE' THEN 0-a.menuorder ELSE a.menuorder END,a.moduletype" , connectionString, ResultType = ResultType.Tuples>
 
+
+        type GetAllMenu =
+            SqlCommandProvider<"
+
+SELECT a.menucode, a.english, a.submenu, a.menulevel FROM menus a with (nolock) WHERE a.menucode<>'FAVORITE' AND a.submenu<>'FAVORITE'
+AND a.menucode<>'ESS' AND a.submenu<>'ESS'  
+and (a.menucode + '_' +convert(nvarchar, a.menuopt) <> 'PAYROLL_9' )  
+ORDER BY a.menulevel,a.menucode,
+CASE WHEN a.menuopt<1000 AND a.menucode='WEBSITE'
+    THEN 0-a.menuorder
+    ELSE a.menuorder
+END, a.moduletype" , connectionString, ResultType = ResultType.Tuples>
+
+
         let conn = 
             let conn = new SqlConnection(connectionString)
             conn.Open()
@@ -23,3 +37,6 @@ module Database =
     let getMainMenu(levelparam, menucodeparam) = 
         (new Sql.GetMainMenu()).Execute(level = levelparam, menucode = menucodeparam)
         //(new Sql.GetMainMenu()).AsyncExecute() 
+
+    let getAllMenu () = 
+        (new Sql.GetAllMenu()).Execute()

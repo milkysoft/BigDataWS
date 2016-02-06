@@ -20,3 +20,11 @@ module Server =
         async {            
             return s
         }
+
+    let GetAllMenu() =
+        let mutable s = Database.getAllMenu()
+                        |> List.ofSeq
+        
+        async {            
+            return s
+        }
