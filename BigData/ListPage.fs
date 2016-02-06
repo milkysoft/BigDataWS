@@ -39,36 +39,38 @@ module ListPage =
             Title : string
             Content : string
             CreateDate : string
-            EditDate : string }
+            EditDate : string
+        }
 
     // Story model
     type PostModel =
-        {   Id : int            
+        {
+            Id : int            
             Title : Var<string>
             Content : Var<string>
             CreateDate : string
             EditDate : Var<string> 
-            Num : Var<int>
-            EditedTitle : Var<string>
-            EditedContent : Var<string>
-            IsEditMode : Var<bool>
-    }
+        }
 
     // Blog model
     type BlogModel = 
         {   Posts : ListModel<int,PostModel> }
     
 
-    let post1 =
-         {Id=1; Title=Var.Create "111ssdfds"; Content = Var.Create "333fsfsdf";CreateDate= "2015-01-01";EditDate=Var.Create "2015-01-01";Num=Var.Create 1;EditedTitle=Var.Create "dsadsdsa"; EditedContent = Var.Create "dsadsad"; IsEditMode=Var.Create false}
-
-    let post2 =
-         {Id=2; Title=Var.Create "222ssdfds"; Content = Var.Create "44444fsfsdf";CreateDate= "2015-01-01";EditDate=Var.Create "2015-01-01";Num=Var.Create 1;EditedTitle=Var.Create "dsadsdsa"; EditedContent = Var.Create "dsadsad"; IsEditMode=Var.Create false}
+//    let post1 =
+//         {Id=1; Title=Var.Create "111ssdfds"; Content = Var.Create "333fsfsdf";CreateDate= "2015-01-01";EditDate=Var.Create "2015-01-01";Num=Var.Create 1;EditedTitle=Var.Create "dsadsdsa"; EditedContent = Var.Create "dsadsad"; IsEditMode=Var.Create false}
+//
+//    let post2 =
+//         {Id=2; Title=Var.Create "222ssdfds"; Content = Var.Create "44444fsfsdf";CreateDate= "2015-01-01";EditDate=Var.Create "2015-01-01";Num=Var.Create 1;EditedTitle=Var.Create "dsadsdsa"; EditedContent = Var.Create "dsadsad"; IsEditMode=Var.Create false}
     
 
+    let ListDataToPosts (data:int*System.DateTime*System.DateTime*string*string) =
+        let Id, CreateDate, EditDate, Content, Title = data
+        let post :PostModel=
+            {Id=Id; CreateDate=CreateDate.ToLongDateString();
+             EditDate=Var.Create(EditDate.ToLongDateString()); Content=Var.Create Content; Title=Var.Create Title}
+        post
     let postList = ListModel.Create (fun i ->  int i.Id) []
-
-
     let rvSubmit = Var.Create ()
     
     let v'blog =
@@ -154,7 +156,7 @@ module ListPage =
     let mutable iid = 5
     let addNewBlog =
         iid <- iid + 1
-        postList.Add({Id=iid; Title=Var.Create( "New item " + iid.ToString() + " title"); Content = Var.Create "44444fsfsdf";CreateDate= "2015-01-01";EditDate=Var.Create "2015-01-01";Num=Var.Create 1;EditedTitle=Var.Create "dsadsdsa"; EditedContent = Var.Create "dsadsad"; IsEditMode=Var.Create false})
+        postList.Add({Id=iid; Title=Var.Create( "New item " + iid.ToString() + " title"); Content = Var.Create "44444fsfsdf";CreateDate= "2015-01-01";EditDate=Var.Create "2015-01-01"})
         JavaScript.Console.Log iid
 
 
@@ -194,8 +196,27 @@ module ListPage =
 
 
     let Main () =
-        postList.Add post1
-        postList.Add post2
+//        postList.Add post1
+//        postList.Add post2
+
+        //let allData = Server.GetAllPosts()
+        //let runAllData = allData |> Async.RunSynchronously
+        async {
+            let! allData = Server.GetAllPosts()
+            let mappedPosts = List.map ListDataToPosts allData
+            mappedPosts |> List.iter( fun x -> postList.Add x )
+            //do! outputFile.AsyncWrite(bufferData) 
+            //do! List.map ListDataToPosts runAllData
+        }
+        |> Async.Start
+        
+        //let mappedPosts = List.map ListDataToPosts allData
+        //let mappedPosts = List.map ListDataToPosts runAllData
+        
+
+        //mappedPosts |> List.iter( fun x -> postList.Add x )
+
+
         let blog = 
             { Posts = postList }
         let rvInput = Var.Create ""
@@ -236,9 +257,7 @@ module ListPage =
         let replacePost (post : PostModel) : PostModel option =
             let newPost = {Id=post.Id; Title=Var.Create rvPostTitle.Value;
                             Content = Var.Create rvPostContent.Value;
-                            CreateDate= "2015-01-01";EditDate=Var.Create "2015-01-01";
-                            Num=Var.Create 1;EditedTitle=Var.Create "dsadsdsa";
-                            EditedContent = Var.Create "dsadsad"; IsEditMode=Var.Create false}
+                            CreateDate= "2015-01-01";EditDate=Var.Create "2015-01-01"}
 
             
             if newPost.Id > 0 then Some(newPost) else None
@@ -266,10 +285,15 @@ module ListPage =
                     <| fun _ ->
                         JQuery.JQuery.Of("#blogItems").Show().Ignore
                         JQuery.JQuery.Of("#loginform").RemoveClass("divshown").AddClass("divhidden").Ignore
-
-                        let a = JQuery.JQuery.Of(sprintf "#post-%d-article" rvRowIndex.Value).Children(".panel-heading").First().Children().First()
-                        let post = postList.FindByKey(rvRowIndex.Value)
-                        postList.UpdateBy replacePost rvRowIndex.Value
+                        async {
+                            let! data = Server.setPostContent rvRowIndex.Value rvPostTitle.Value rvPostContent.Value
+                            let post = postList.FindByKey(rvRowIndex.Value)
+                            postList.UpdateBy replacePost rvRowIndex.Value
+                        }
+                        |> Async.Start
+                        //let a = JQuery.JQuery.Of(sprintf "#post-%d-article" rvRowIndex.Value).Children(".panel-heading").First().Children().First()
+                        //let post = postList.FindByKey(rvRowIndex.Value)
+                        //postList.UpdateBy replacePost rvRowIndex.Value
                         //JavaScript.Console.Log( rvPostTitle.Value )
                         //JavaScript.Console.Log( rvPostContent.Value )
                         //JQuery.JQuery.Of(sprintf "#post-%d-article" rvRowIndex.Value).Children(".panel-heading").First().Children().First().Text(rvPostTitle.Value).Ignore

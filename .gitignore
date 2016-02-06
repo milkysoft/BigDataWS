@@ -132,6 +132,8 @@ DocProject/Help/*.hhp
 DocProject/Help/Html2
 DocProject/Help/html
 
+BigData/Scripts/WebSharper/*.*
+
 # Click-Once directory
 publish/
 

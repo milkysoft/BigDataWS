@@ -1,6 +1,6 @@
 (function()
 {
- var Global=this,Runtime=this.IntelliFactory.Runtime,console,alert,Forms,Pervasives,Form1,Form,Validation,List,Bootstrap,Controls,T,Application2,Client,UI,Next,AttrProxy,Simple,Doc,Var,Submitter,Remoting,AjaxRemotingProvider,Concurrency,View,AttrModule,Seq,ListModel1,String,Var1,jQuery,ListModel,View1,ListPage;
+ var Global=this,Runtime=this.IntelliFactory.Runtime,console,alert,Forms,Pervasives,Form1,Form,Validation,List,Bootstrap,Controls,T,Application2,Client,UI,Next,AttrProxy,Simple,Doc,Var,Submitter,Remoting,AjaxRemotingProvider,Concurrency,View,AttrModule,Seq,ListModel1,String,Var1,jQuery,ListModel,View1,DateTimeHelpers,ListPage;
  Runtime.Define(Global,{
   Application2:{
    Client:{
@@ -322,19 +322,54 @@
     })
    },
    ListPage:{
+    ListDataToPosts:function(_,_1,_2,_3,_4)
+    {
+     var data,Title,Id,EditDate,CreateDate,Content,CreateDate1,EditDate1,Content1,post;
+     data=[_,_1,_2,_3,_4];
+     Title=data[4];
+     Id=data[0];
+     EditDate=data[2];
+     CreateDate=data[1];
+     Content=data[3];
+     CreateDate1=DateTimeHelpers.LongDate(CreateDate);
+     EditDate1=Var.Create(DateTimeHelpers.LongDate(EditDate));
+     Content1=Var.Create(Content);
+     post={
+      Id:Id,
+      Title:Var.Create(Title),
+      Content:Content1,
+      CreateDate:CreateDate1,
+      EditDate:EditDate1
+     };
+     return post;
+    },
     Main:function()
     {
      var blog,rvInput,submit,arg00,arg10,vReversed,_attr_container1,_attr_container2,_attrs_container,_attr_title1,_attr_title2,_attrs_title,_attr_content1,_attr_content2,_attrs_content,_attr_search1,_attr_search2,_attrs_search,_attr_divid,_attr_divclass,attrs_div,_attr_login_divid,_attr_login_divclass,_attrs_login_div,_attr_login_style,_attrs_login_style_seq,replacePost,ats,arg20,arg201,_arg10_,_arg20_,ats1,ats2,ats3,ats4,arg202;
-     ListPage.postList().Add(ListPage.post1());
-     ListPage.postList().Add(ListPage.post2());
+     Concurrency.Start(Concurrency.Delay(function()
+     {
+      return Concurrency.Bind(AjaxRemotingProvider.Async("Application2:3",[]),function(_arg1)
+      {
+       Seq.iter(function(x)
+       {
+        return ListPage.postList().Add(x);
+       },List.map(function(tupledArg)
+       {
+        return ListPage.ListDataToPosts(tupledArg[0],tupledArg[1],tupledArg[2],tupledArg[3],tupledArg[4]);
+       },_arg1));
+       return Concurrency.Return(null);
+      });
+     }),{
+      $:0
+     });
      blog={
       Posts:ListPage.postList()
      };
      rvInput=Var.Create("");
      submit=Submitter.CreateOption(rvInput.get_View());
-     arg00=function(_arg1)
+     arg00=function(_arg2)
      {
-      return _arg1.$==1?AjaxRemotingProvider.Async("Application2:0",[_arg1.$0]):Concurrency.Delay(function()
+      return _arg2.$==1?AjaxRemotingProvider.Async("Application2:0",[_arg2.$0]):Concurrency.Delay(function()
       {
        return Concurrency.Return("");
       });
@@ -369,11 +404,7 @@
        Title:Var.Create(Var1.Get(ListPage.rvPostTitle())),
        Content:Var.Create(Var1.Get(ListPage.rvPostContent())),
        CreateDate:"2015-01-01",
-       EditDate:Var.Create("2015-01-01"),
-       Num:Var.Create(1),
-       EditedTitle:Var.Create("dsadsdsa"),
-       EditedContent:Var.Create("dsadsad"),
-       IsEditMode:Var.Create(false)
+       EditDate:Var.Create("2015-01-01")
       };
       return newPost.Id>0?{
        $:1,
@@ -399,13 +430,21 @@
      arg202=List.ofArray([Doc.Input(_attrs_search,ListPage.rvSearch())]);
      return Doc.Element("div",_attrs_container,List.ofArray([Doc.Element("div",_attrs_login_style_seq,List.ofArray([Doc.Element("div",ats,List.ofArray([Doc.Element("div",List.ofArray([AttrProxy.Create("class","col-sm-12")]),List.ofArray([Doc.Element("label",[],arg20)])),Doc.Element("div",List.ofArray([AttrProxy.Create("class","col-sm-12")]),List.ofArray([Doc.InputArea(_attrs_title,ListPage.rvPostTitle())])),Doc.Element("div",List.ofArray([AttrProxy.Create("class","col-sm-12")]),List.ofArray([Doc.Element("label",[],arg201)])),Doc.Element("div",List.ofArray([AttrProxy.Create("class","col-sm-12")]),List.ofArray([Doc.InputArea(_attrs_title,ListPage.rvPostContent())])),Doc.Button("Save",_arg10_,function()
      {
-      var arg101;
       jQuery("#blogItems").show();
       jQuery("#loginform").removeClass("divshown").addClass("divhidden");
-      jQuery("#post-"+Global.String(Var1.Get(ListPage.rvRowIndex()))+"-article").children(".panel-heading").first().children().first();
-      ListPage.postList().FindByKey(Var1.Get(ListPage.rvRowIndex()));
-      arg101=Var1.Get(ListPage.rvRowIndex());
-      return ListPage.postList().UpdateBy(replacePost,arg101);
+      return Concurrency.Start(Concurrency.Delay(function()
+      {
+       return Concurrency.Bind(AjaxRemotingProvider.Async("Application2:4",[Var1.Get(ListPage.rvRowIndex()),Var1.Get(ListPage.rvPostTitle()),Var1.Get(ListPage.rvPostContent())]),function()
+       {
+        var arg101;
+        ListPage.postList().FindByKey(Var1.Get(ListPage.rvRowIndex()));
+        arg101=Var1.Get(ListPage.rvRowIndex());
+        ListPage.postList().UpdateBy(replacePost,arg101);
+        return Concurrency.Return(null);
+       });
+      }),{
+       $:0
+      });
      }),Doc.Button("Cancel",List.ofArray([AttrModule.Class("btn btn-default")]),_arg20_)]))])),Doc.Element("div",ats1,List.ofArray([ListPage["doc'nav'left"](),Doc.Element("div",ats2,List.ofArray([Doc.Element("div",ats3,List.ofArray([Doc.Element("div",ats4,List.ofArray([Doc.Element("div",List.ofArray([AttrModule.Class("nav")]),List.ofArray([Doc.Element("ul",List.ofArray([AttrModule.Class("nav navbar-nav sm sm-collapsible")]),List.ofArray([Doc.Element("li",[],arg202)])),Doc.EmbedView(ListPage.loaddata())]))]))]))]))])),Doc.Element("div",attrs_div,List.ofArray([Doc.EmbedView(View.Map(function()
      {
       return Doc.Convert(function(p)
@@ -427,11 +466,7 @@
       Title:Var.Create("New item "+String(ListPage.iid())+" title"),
       Content:Var.Create("44444fsfsdf"),
       CreateDate:"2015-01-01",
-      EditDate:Var.Create("2015-01-01"),
-      Num:Var.Create(1),
-      EditedTitle:Var.Create("dsadsdsa"),
-      EditedContent:Var.Create("dsadsad"),
-      IsEditMode:Var.Create(false)
+      EditDate:Var.Create("2015-01-01")
      });
      a=ListPage.iid();
      return console?console.log(a):undefined;
@@ -539,34 +574,6 @@
      };
      return View.MapAsync(arg00,x);
     }),
-    post1:Runtime.Field(function()
-    {
-     return{
-      Id:1,
-      Title:Var.Create("111ssdfds"),
-      Content:Var.Create("333fsfsdf"),
-      CreateDate:"2015-01-01",
-      EditDate:Var.Create("2015-01-01"),
-      Num:Var.Create(1),
-      EditedTitle:Var.Create("dsadsdsa"),
-      EditedContent:Var.Create("dsadsad"),
-      IsEditMode:Var.Create(false)
-     };
-    }),
-    post2:Runtime.Field(function()
-    {
-     return{
-      Id:2,
-      Title:Var.Create("222ssdfds"),
-      Content:Var.Create("44444fsfsdf"),
-      CreateDate:"2015-01-01",
-      EditDate:Var.Create("2015-01-01"),
-      Num:Var.Create(1),
-      EditedTitle:Var.Create("dsadsdsa"),
-      EditedContent:Var.Create("dsadsad"),
-      IsEditMode:Var.Create(false)
-     };
-    }),
     postList:Runtime.Field(function()
     {
      var arg00,arg10;
@@ -654,6 +661,7 @@
   jQuery=Runtime.Safe(Global.jQuery);
   ListModel=Runtime.Safe(Next.ListModel);
   View1=Runtime.Safe(Next.View1);
+  DateTimeHelpers=Runtime.Safe(Global.WebSharper.DateTimeHelpers);
   return ListPage=Runtime.Safe(Application2.ListPage);
  });
  Runtime.OnLoad(function()
@@ -666,8 +674,6 @@
   ListPage.rvPostTitle();
   ListPage.rvPostContent();
   ListPage.postList();
-  ListPage.post2();
-  ListPage.post1();
   ListPage.loaddata();
   ListPage.iid();
   ListPage["doc'nav'left"]();

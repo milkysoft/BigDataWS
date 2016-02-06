@@ -20,7 +20,8 @@ module Server =
         async {            
             return s
         }
-
+    
+    [<Rpc>]
     let GetAllMenu() =
         let mutable s = Database.getAllMenu()
                         |> List.ofSeq
@@ -28,3 +29,16 @@ module Server =
         async {            
             return s
         }
+
+    [<Rpc>]
+    let GetAllPosts() =
+        let mutable s = Database.getAllPosts()
+                        |> List.ofSeq 
+        
+        async {            
+            return s
+        }
+
+    [<Rpc>]
+    let setPostContent id title content  = 
+       Database.setPost1 id title content
