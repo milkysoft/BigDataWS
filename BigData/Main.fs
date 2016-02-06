@@ -38,7 +38,9 @@ type EndPoint =
 module Templating =
     open WebSharper.UI.Next.Html
 
-    type MainTemplate = Templating.Template<"Main.html">
+    type MainTemplate = Templating.Template<"HTML\Main.html">
+
+    type ListTemplate = Templating.Template<"HTML\ListPage.html">
     
 
 
@@ -79,45 +81,19 @@ module Templating =
     
     // Compute a menubar where the menu item for the given endpoint is active
     let MenuBar (ctx: Context<EndPoint>) endpoint : Doc list =
-
-
-
-
-        let myTree =
-            { menucode = "0"; Description = "Root"; Children = 
-            [
-                { menucode = "1"; Description = "Mechanical"; Children = [] };
-                { menucode = "2"; Description = "Electrical"; Children =         
-                [
-                    { menucode = "3"; Description = "High Voltage"; Children = 
-                    [
-                        { menucode = "5"; Description = "HV Maintanence"; Children = [] };
-                        { menucode = "6"; Description = "City Power"; Children = [] }
-                    ] };
-                    { menucode = "4"; Description = "Low Voltage"; Children = 
-                    [
-                        { menucode = "7"; Description = "LV Wiring"; Children = [] } ;
-                        { menucode = "8"; Description = "LV Maintanence"; Children = [] }
-                    ] }
-                ]};
-            ]}
-
-        //let rec getChildren (node : Node) = 
-        //    Seq.concat [node.Children; (Seq.collect getChildren node.Children)]
-
         let mutable rootNode = { menucode = "0"; Description = "Root"; Children = [] }
 
         let menu0 :T5PMenu= {english="Root"; menulevel=0; menucode="ROOTNODE"; submenu="WEBSITE"}
-        let menu1 :T5PMenu= {english="System Configuration"; menulevel=1; menucode="WEBSITE"; submenu="SYSCFG"}
-        let menu11 :T5PMenu= {english="Company Information Setup"; menulevel=2; menucode="SYSCFG"; submenu=""}
-        let menu2 :T5PMenu= {english="System Utility"; menulevel=1; menucode="WEBSITE"; submenu="SYSUTY"}
-
-        let theT5pMenu = [ 
-            menu0;
-            menu1;
-            menu11;
-            menu2
-            ]
+//        let menu1 :T5PMenu= {english="System Configuration"; menulevel=1; menucode="WEBSITE"; submenu="SYSCFG"}
+//        let menu11 :T5PMenu= {english="Company Information Setup"; menulevel=2; menucode="SYSCFG"; submenu=""}
+//        let menu2 :T5PMenu= {english="System Utility"; menulevel=1; menucode="WEBSITE"; submenu="SYSUTY"}
+//
+//        let theT5pMenu = [ 
+//            menu0;
+//            menu1;
+//            menu11;
+//            menu2
+//            ]
 
         let ListMenuToT5PMenu (data:string*string*string*int) =
             let menucode, english, submenu, menulevel = data
@@ -152,19 +128,12 @@ module Templating =
                   ]
             else
                 li[
-                //liAttr [attr.``class`` "dropdown"] [
-                //    aAttr a'attr'list [
-                //        Doc.TextNode (p.Description + " ")
-                //        spanAttr[Attr.Create "class" "caret"][Doc.TextNode ""]
-                //    ]
                     aAttr[Attr.Create "href" "#"][
                         Doc.TextNode (p.Description + " ")
                         spanAttr[attr.``class`` "caret"][
                             ]
                         ]
                     ulAttr[attr.``class`` "dropdown-menu"][
-                        //p.Children
-                        //|> Seq.map addTopMenu
                         let docMenu2 = p.Children |> Seq.map addTopMenu 
                         for x in docMenu2 do
                             yield x :> Doc
@@ -306,6 +275,15 @@ module Templating =
             )
         )
 
+    let ListPage ctx action title body =
+        Content.Page(
+            ListTemplate.Doc(
+                title = title,
+                body = body
+            )
+        )
+
+
 module Site =
     open WebSharper.UI.Next.Html
 
@@ -330,9 +308,10 @@ module Site =
             div [client <@ Client.Main() @>]
         ]
     let CompanySetupPage ctx =
-        Templating.Main ctx EndPoint.ProcessManagement "Company Setup" [
-            h1 [text "Company Setup"]
-            p [text "This is a template WebSharper client-server application."]
+        Templating.ListPage ctx EndPoint.ProcessManagement "Company Setup" [
+            div [client <@ ListPage.Main() @>]
+            //h1 [text "Company Setup"]
+            //p [text "This is a template WebSharper client-server application."]
         ]
     let OrgPositionMaintenancePage ctx =
         Templating.Main ctx EndPoint.ProcessManagement "Organization & Position Maintenance" [

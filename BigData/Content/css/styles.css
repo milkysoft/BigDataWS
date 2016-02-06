@@ -18,10 +18,11 @@
 }
 
 .divhidden {
-    visibility: hidden;
+    display: none;
 }
+
 .divshown {
-    visibility: visible;
+    display: inherit;
 }
 
 /* Sticky footer styles */

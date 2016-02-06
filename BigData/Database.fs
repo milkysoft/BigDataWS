@@ -10,7 +10,7 @@ module Database =
         [<Literal>]
         
         let connectionString = 
-            """Data Source=.;Initial Catalog=rtest;User Id=zuoqin;Password=Qwerty123;MultipleActiveResultSets=True;"""
+            """Data Source=.;Initial Catalog=BigData;User Id=zuoqin;Password=Qwerty123;MultipleActiveResultSets=True;"""
         type GetMainMenu =
             SqlCommandProvider<"SELECT a.menuorder, a.english, a.chinese, a.menucode, a.submenu FROM menus a with (nolock) WHERE a.menucode<>'FAVORITE' AND a.submenu<>'FAVORITE' AND a.menucode<>'ESS' AND a.submenu<>'ESS' and menulevel = @level and menucode=@menucode and (a.menucode + '_' +convert(nvarchar, a.menuopt) <> 'PAYROLL_9' )  ORDER BY a.menulevel,a.menucode,CASE WHEN a.menuopt<1000 AND a.menucode='WEBSITE' THEN 0-a.menuorder ELSE a.menuorder END,a.moduletype" , connectionString, ResultType = ResultType.Tuples>
 
